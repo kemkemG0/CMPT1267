@@ -41,6 +41,11 @@ int main(int argc, char* args[]){
                         if (event.type == SDL_QUIT) {
                             is_running = false;
                         }
+						else if(event.type==SDL_KEYDOWN){
+							if(event.key.keysym.sym==SDLK_0){
+								is_running=false;
+							}
+						}
                     }
                     SDL_Delay(16);
                 }

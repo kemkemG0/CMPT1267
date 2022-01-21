@@ -19,6 +19,8 @@ int main(int argc, char* args[]){
 		}
 		else{
 			screenSurface = SDL_GetWindowSurface(window);
+            SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0, 0, 255));
+            SDL_UpdateWindowSurface(window);
             bool is_running = true;
             SDL_Event event;
             while (is_running) {
