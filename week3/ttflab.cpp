@@ -96,7 +96,7 @@ int main(int argc, char* args[])
 	myWindow = NULL;
 	theRenderer = NULL;
 
-	IMG_Quit();
+    TTF_Quit();
 	SDL_Quit();
 	return 0;
 }
