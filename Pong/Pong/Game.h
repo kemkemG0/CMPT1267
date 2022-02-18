@@ -24,6 +24,8 @@ private:
 	SDL_Renderer* mRenderer;
 	Uint32 mTicksCount;
 	
+	short int bg_color[3]={0, 0, 255};
+	
 	bool mIsRunning;
 	int mPaddleDir;
 	Vector2 mPaddlePos;
