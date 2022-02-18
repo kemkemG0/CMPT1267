@@ -1,12 +1,18 @@
+// #include <SDL2/SDL.h>
+// #include <SDL2/SDL_image.h>
+// #include <SDL2/SDL_mixer.h>
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_mixer.h"
 #include <iostream>
 #include <string>
+#include<map>
 using namespace std;
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
+
+enum Img_Key{GUITAR, BELLS, DRUM, CRASH};
 
 int main(int argc, char* args[])
 {
@@ -29,7 +35,14 @@ int main(int argc, char* args[])
 	string imageFile = "HelloSDL.png";
 	SDL_Surface* theSurface = IMG_Load(imageFile.c_str());
 	newTexture = SDL_CreateTextureFromSurface(theRenderer, theSurface);
-		
+	
+	map<Img_Key,SDL_Texture*> imgInstrument;
+	imgInstrument[GUITAR] = SDL_CreateTextureFromSurface(theRenderer,IMG_Load("Guitar.png"));
+	imgInstrument[BELLS] = SDL_CreateTextureFromSurface(theRenderer,IMG_Load("Bells.png"));
+	imgInstrument[DRUM] = SDL_CreateTextureFromSurface(theRenderer,IMG_Load("Drum.png"));
+	imgInstrument[CRASH] = SDL_CreateTextureFromSurface(theRenderer,IMG_Load("Crash.png"));
+
+
 	SDL_FreeSurface(theSurface);
 	gCasio = Mix_LoadMUS("Casio.wav");
 	gScratch = Mix_LoadWAV("Guitar.wav");
@@ -56,21 +69,25 @@ int main(int argc, char* args[])
 					//Play high sound effect
 				case SDLK_1:
 					Mix_PlayChannel(-1, gHigh, 0);
+					newTexture = imgInstrument[BELLS];
 					break;
 
 					//Play medium sound effect
 				case SDLK_2:
 					Mix_PlayChannel(-1, gMedium, 0);
+					newTexture = imgInstrument[DRUM];
 					break;
 
 					//Play low sound effect
 				case SDLK_3:
 					Mix_PlayChannel(-1, gLow, 0);
+					newTexture = imgInstrument[CRASH];
 					break;
 
 					//Play scratch sound effect
 				case SDLK_4:
 					Mix_PlayChannel(-1, gScratch, 0);
+					newTexture = imgInstrument[GUITAR];
 					break;
 
 				case SDLK_9:
@@ -104,10 +121,10 @@ int main(int argc, char* args[])
 					break;
 				}
 			}
-			
 		}
 		SDL_SetRenderDrawColor(theRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 		SDL_RenderClear(theRenderer);
+		SDL_RenderCopy(theRenderer,newTexture,NULL,NULL);
 		SDL_RenderPresent(theRenderer);
 	}
 	Mix_FreeChunk(gScratch);
@@ -124,6 +141,10 @@ int main(int argc, char* args[])
 	gCasio = NULL;
 	SDL_DestroyTexture(newTexture);
 	newTexture = NULL;
+	for(auto& [name,tx]:imgInstrument){
+		SDL_DestroyTexture(tx);
+		tx = NULL;
+	}
 
 	SDL_DestroyRenderer(theRenderer);
 	SDL_DestroyWindow(myWindow);
