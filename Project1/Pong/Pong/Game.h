@@ -1,6 +1,5 @@
 #pragma once
-// #include "SDL/SDL.h"
-#include <SDL2/SDL.h>
+#include "SDL/SDL.h"
 
 struct Vector2
 {
@@ -23,8 +22,6 @@ private:
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
 	Uint32 mTicksCount;
-	
-	short int bg_color[3]={0, 0, 255};
 	
 	bool mIsRunning;
 	int mPaddleDir;

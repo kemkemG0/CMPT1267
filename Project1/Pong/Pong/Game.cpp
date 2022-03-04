@@ -83,25 +83,6 @@ void Game::ProcessInput()
 				mIsRunning = false;
 				break;
 		}
-		if(event.type==SDL_KEYDOWN){
-			switch (event.key.keysym.sym){
-				case SDLK_r:
-					bg_color[0]=255;
-					bg_color[1]=0;
-					bg_color[2]=0;
-					break;
-				case SDLK_g:
-					bg_color[0]=0;
-					bg_color[1]=255;
-					bg_color[2]=0;
-					break;
-				case SDLK_b:
-					bg_color[0]=0;
-					bg_color[1]=0;
-					bg_color[2]=255;
-					break;
-			}
-		}
 	}
 	
 	// Get state of keyboard
@@ -114,11 +95,11 @@ void Game::ProcessInput()
 	
 	// Update paddle direction based on W/S keys
 	mPaddleDir = 0;
-	if (state[SDL_SCANCODE_W] || state[SDL_SCANCODE_UP])
+	if (state[SDL_SCANCODE_W])
 	{
 		mPaddleDir -= 1;
 	}
-	if (state[SDL_SCANCODE_S] || state[SDL_SCANCODE_DOWN])
+	if (state[SDL_SCANCODE_S])
 	{
 		mPaddleDir += 1;
 	}
@@ -203,21 +184,20 @@ void Game::UpdateGame()
 
 void Game::GenerateOutput()
 {
-	// Set BG color
+	// Set draw color to blue
 	SDL_SetRenderDrawColor(
 		mRenderer,
-		bg_color[0],		// R
-		bg_color[1],		// G 
-		bg_color[2],	    // B
-		255		            // A
+		0,		// R
+		0,		// G 
+		255,	// B
+		255		// A
 	);
 	
 	// Clear back buffer
 	SDL_RenderClear(mRenderer);
 
 	// Draw walls
-	// YELLOW
-	SDL_SetRenderDrawColor(mRenderer, 255, 255, 0, 255);
+	SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
 	
 	// Draw top wall
 	SDL_Rect wall{
