@@ -1,5 +1,5 @@
 #pragma once
-#include "SDL/SDL.h"
+#include <SDL2/SDL.h>
 
 struct Vector2
 {
@@ -28,4 +28,7 @@ private:
 	Vector2 mPaddlePos;
 	Vector2 mBallPos;
 	Vector2 mBallVel;
+
+	short int bgCol[2][3] = {{0, 155 ,0}, {155 , 0, 0}};
+	bool bgTurn = 0;
 };

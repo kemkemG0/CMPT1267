@@ -1,6 +1,5 @@
-
 #include "Game.h"
-
+#include <iostream>
 const int thickness = 15;
 const float paddleH = 100.0f;
 
@@ -105,11 +104,9 @@ void Game::ProcessInput()
 	}
 }
 
-void Game::UpdateGame()
-{
+void Game::UpdateGame(){
 	// Wait until 16ms has elapsed since last frame
-	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16))
-		;
+	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16));
 
 	// Delta time is the difference in ticks from last frame
 	// (converted to seconds)
@@ -157,6 +154,7 @@ void Game::UpdateGame()
 		mBallVel.x < 0.0f)
 	{
 		mBallVel.x *= -1.0f;
+		bgTurn = !bgTurn;//change the flag of color
 	}
 	// Did the ball go off the screen? (if so, end game)
 	else if (mBallPos.x <= 0.0f)
@@ -187,9 +185,9 @@ void Game::GenerateOutput()
 	// Set draw color to blue
 	SDL_SetRenderDrawColor(
 		mRenderer,
-		0,		// R
-		0,		// G 
-		255,	// B
+		bgCol[bgTurn][0],		// R
+		bgCol[bgTurn][1],		// G 
+		bgCol[bgTurn][2],	    // B
 		255		// A
 	);
 	
@@ -197,7 +195,7 @@ void Game::GenerateOutput()
 	SDL_RenderClear(mRenderer);
 
 	// Draw walls
-	SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(mRenderer, 200, 200, 0, 255);
 	
 	// Draw top wall
 	SDL_Rect wall{
