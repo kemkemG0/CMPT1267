@@ -1,5 +1,7 @@
 #include "Game.h"
+#include <SDL2/SDL_image.h>
 #include <iostream>
+#include <fstream>
 const int thickness = 15;
 const float paddleH = 100.0f;
 
@@ -10,12 +12,37 @@ Game::Game()
 	mTicksCount=0;
 	mIsRunning=true;
 	mPaddleDir=0;
+
+	paddleTex.tex = ballTex.tex =  nullptr;
 }
+
+void Game::loadFromFile(std::string path, Tex& tex )
+{
+	if (tex.tex != NULL)
+	{
+		SDL_DestroyTexture(tex.tex);
+		tex.tex = NULL;
+	}
+	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+	tex.tex = SDL_CreateTextureFromSurface(mRenderer, loadedSurface);
+
+	if (loadedSurface != nullptr)
+	{
+		tex.width = loadedSurface->w;
+		tex.height = loadedSurface->h;
+	}
+	else
+	{
+		printf("Error! Cannot Load the Image!!");
+		SDL_FreeSurface(loadedSurface);
+	}
+}
+
 
 bool Game::Initialize()
 {
 	// Initialize SDL
-	int sdlResult = SDL_Init(SDL_INIT_VIDEO);
+	int sdlResult = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	if (sdlResult != 0)
 	{
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -50,13 +77,26 @@ bool Game::Initialize()
 		SDL_Log("Failed to create renderer: %s", SDL_GetError());
 		return false;
 	}
-	//
+
 	mPaddlePos.x = 10.0f;
 	mPaddlePos.y = 768.0f/2.0f;
 	mBallPos.x = 1024.0f/2.0f;
 	mBallPos.y = 768.0f/2.0f;
 	mBallVel.x = -200.0f;
 	mBallVel.y = 235.0f;
+
+	IMG_Init(IMG_INIT_PNG);
+	loadFromFile("ball.png", ballTex);
+	loadFromFile("go.png", paddleTex);
+
+
+	// Load files
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	hitSound = Mix_LoadWAV("hit.wav");
+	bgmSound = Mix_LoadMUS("bgm.wav");
+	Mix_PlayMusic(bgmSound,-1);
+	
+
 	return true;
 }
 
@@ -81,6 +121,15 @@ void Game::ProcessInput()
 			case SDL_QUIT:
 				mIsRunning = false;
 				break;
+		}
+		if(event.type==SDL_KEYDOWN){
+			switch (event.key.keysym.sym){
+				case SDLK_z:
+					std::cout<<"stop\n";
+					if (Mix_PausedMusic() == 1) Mix_ResumeMusic();
+					else Mix_PauseMusic();
+				break;
+			}
 		}
 	}
 	
@@ -155,6 +204,7 @@ void Game::UpdateGame(){
 	{
 		mBallVel.x *= -1.0f;
 		bgTurn = !bgTurn;//change the flag of color
+		Mix_PlayChannel(-1, hitSound, 0);
 	}
 	// Did the ball go off the screen? (if so, end game)
 	else if (mBallPos.x <= 0.0f)
@@ -227,21 +277,45 @@ void Game::GenerateOutput()
 	SDL_RenderFillRect(mRenderer, &paddle);
 	
 	// Draw ball
-	SDL_Rect ball{	
-		static_cast<int>(mBallPos.x - thickness/2),
-		static_cast<int>(mBallPos.y - thickness/2),
-		thickness,
-		thickness
-	};
-	SDL_RenderFillRect(mRenderer, &ball);
+	SDL_Rect newBall;  
+	newBall.x = mBallPos.x - thickness / 2;
+	newBall.y = mBallPos.y - thickness / 2;
+	newBall.h = thickness + 15;
+	newBall.w = thickness + 15;
+	SDL_RenderCopy(mRenderer, ballTex.tex, NULL, &newBall);
+
+
+	// Draw paddle
+	// Draw ball
+	SDL_Rect newPaddle;
+	newPaddle.x = mPaddlePos.x;
+	newPaddle.y = mPaddlePos.y - paddleH/2,
+	newPaddle.w = thickness,
+	newPaddle.h = paddleH;
+	SDL_RenderCopy(mRenderer, paddleTex.tex, NULL, &newPaddle);
 	
 	// Swap front buffer and back buffer
 	SDL_RenderPresent(mRenderer);
+}
+
+void destroyTextures(Tex& tex){
+	if (tex.tex != NULL)
+	{
+		SDL_DestroyTexture(tex.tex);
+		tex.tex = NULL;
+	}
 }
 
 void Game::Shutdown()
 {
 	SDL_DestroyRenderer(mRenderer);
 	SDL_DestroyWindow(mWindow);
+	mRenderer = nullptr;
+	mWindow = nullptr;
+	//Free loaded images
+	destroyTextures(ballTex);
+	destroyTextures(paddleTex);
+	IMG_Quit();
 	SDL_Quit();
 }
+

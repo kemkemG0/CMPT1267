@@ -1,10 +1,17 @@
 #pragma once
 #include <SDL2/SDL.h>
-
+#include <SDL2/SDL_mixer.h>
+#include<string>
 struct Vector2
 {
 	float x;
 	float y;
+};
+
+struct Tex{
+	SDL_Texture* tex;
+	int width;
+	int height;
 };
 
 class Game
@@ -29,6 +36,15 @@ private:
 	Vector2 mBallPos;
 	Vector2 mBallVel;
 
+	Tex paddleTex,ballTex;
+
+	void loadFromFile(std::string path, Tex& tex );
+
 	short int bgCol[2][3] = {{0, 155 ,0}, {155 , 0, 0}};
 	bool bgTurn = 0;
+
+	Mix_Chunk* hitSound = NULL;
+	Mix_Music* bgmSound = NULL;
+	SDL_Event event;
+
 };
