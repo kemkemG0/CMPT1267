@@ -96,7 +96,17 @@ bool Game::Initialize()
 	bgmSound = Mix_LoadMUS("bgm.wav");
 	Mix_PlayMusic(bgmSound,-1);
 	
+	TTF_Init();
 
+	theFont = TTF_OpenFont("Dubai-Regular.ttf", 28);
+	if(theFont==nullptr){
+        std::cout<<"This ttf file does not exist."<<std::endl;
+        return 1;
+    }
+	
+	std::ifstream input("bestscore.txt");
+	input>> bestScore;
+	
 	return true;
 }
 
@@ -125,7 +135,6 @@ void Game::ProcessInput()
 		if(event.type==SDL_KEYDOWN){
 			switch (event.key.keysym.sym){
 				case SDLK_z:
-					std::cout<<"stop\n";
 					if (Mix_PausedMusic() == 1) Mix_ResumeMusic();
 					else Mix_PauseMusic();
 				break;
@@ -205,6 +214,7 @@ void Game::UpdateGame(){
 		mBallVel.x *= -1.0f;
 		bgTurn = !bgTurn;//change the flag of color
 		Mix_PlayChannel(-1, hitSound, 0);
+		++score;
 	}
 	// Did the ball go off the screen? (if so, end game)
 	else if (mBallPos.x <= 0.0f)
@@ -293,6 +303,31 @@ void Game::GenerateOutput()
 	newPaddle.w = thickness,
 	newPaddle.h = paddleH;
 	SDL_RenderCopy(mRenderer, paddleTex.tex, NULL, &newPaddle);
+
+
+	auto currentScoreTex = SDL_CreateTextureFromSurface(
+		mRenderer, 
+		TTF_RenderText_Solid(theFont, std::string("Score:"+ std::to_string(score) ).c_str(), { 0, 0, 0 })
+		);
+	auto bestScoreTex = SDL_CreateTextureFromSurface(
+		mRenderer, 
+		TTF_RenderText_Solid(theFont, std::string("BestScore:"+ std::to_string(bestScore) ).c_str(), { 0, 0, 0 })
+		);
+	SDL_Rect currentScore;
+	currentScore.x = 600;
+	currentScore.y = 50;
+	currentScore.w = 150,
+	currentScore.h = 90;
+	SDL_RenderCopy(mRenderer, currentScoreTex, NULL, &currentScore);
+
+	SDL_Rect bestScoreRect;
+	bestScoreRect.x = 600;
+	bestScoreRect.y = 140;
+	bestScoreRect.w = 200,
+	bestScoreRect.h = 90;
+	SDL_RenderCopy(mRenderer, bestScoreTex, NULL, &bestScoreRect);
+
+
 	
 	// Swap front buffer and back buffer
 	SDL_RenderPresent(mRenderer);
@@ -308,6 +343,8 @@ void destroyTextures(Tex& tex){
 
 void Game::Shutdown()
 {
+	std::ofstream out("bestScore.txt");
+	out << std::max(bestScore,score);
 	SDL_DestroyRenderer(mRenderer);
 	SDL_DestroyWindow(mWindow);
 	mRenderer = nullptr;
@@ -317,5 +354,5 @@ void Game::Shutdown()
 	destroyTextures(paddleTex);
 	IMG_Quit();
 	SDL_Quit();
+	TTF_Quit();
 }
-

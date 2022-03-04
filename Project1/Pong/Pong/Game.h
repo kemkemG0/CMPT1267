@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
+#include "SDL2/SDL_ttf.h"
 #include<string>
 struct Vector2
 {
@@ -43,8 +44,13 @@ private:
 	short int bgCol[2][3] = {{0, 155 ,0}, {155 , 0, 0}};
 	bool bgTurn = 0;
 
+	TTF_Font* theFont = NULL;
+
 	Mix_Chunk* hitSound = NULL;
 	Mix_Music* bgmSound = NULL;
-	SDL_Event event;
+
+	int bestScore = 0;
+	int score=0;
+	
 
 };
