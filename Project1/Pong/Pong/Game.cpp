@@ -326,8 +326,6 @@ void Game::GenerateOutput()
 	bestScoreRect.w = 200,
 	bestScoreRect.h = 90;
 	SDL_RenderCopy(mRenderer, bestScoreTex, NULL, &bestScoreRect);
-
-
 	
 	// Swap front buffer and back buffer
 	SDL_RenderPresent(mRenderer);
